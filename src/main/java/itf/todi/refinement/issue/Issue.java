@@ -6,10 +6,9 @@ import javax.persistence.*;
 
 
 @Entity
-@Table
+@Table(name = "issue")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 @ToString
@@ -38,4 +37,20 @@ public class Issue {
 
     @Enumerated(EnumType.STRING)
     private IssueType type;
+
+    public Issue(
+            String title,
+            String description,
+            Integer storypoints,
+            IssueStatus status,
+            IssuePriority priority,
+            IssueType type
+    ) {
+        this.title = title;
+        this.description = description;
+        this.storypoints = storypoints;
+        this.status = status;
+        this.priority = priority;
+        this.type = type;
+    }
 }
