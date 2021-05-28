@@ -1,9 +1,9 @@
 package itf.todi.refinement.issue;
 
 import lombok.*;
-
 import javax.persistence.*;
-
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "issue")
@@ -25,16 +25,29 @@ public class Issue {
             generator = "issue_sequence"
     )
     private Long id;
+
+    @Column(nullable = false)
+    @Size(min = 1, max = 70)
+    @NotBlank(message = "Title is required")
     private String title;
+
+    @Column(nullable = false)
+    @Size(min = 12, max = 240)
+    @NotBlank(message = "Description is required")
     private String description;
+
+    @Column(nullable = false)
     private Integer storypoints;
 
+    @Column(nullable = false, length = 24)
     @Enumerated(EnumType.STRING)
     private IssueStatus status;
 
+    @Column(nullable = false, length = 24)
     @Enumerated(EnumType.STRING)
     private IssuePriority priority;
 
+    @Column(nullable = false, length = 24)
     @Enumerated(EnumType.STRING)
     private IssueType type;
 
