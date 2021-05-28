@@ -25,46 +25,22 @@ public class IssueService {
     }
 
     @Transactional
-    public Issue updateIssue(
-            Long issueId,
-            IssueStatus status,
-            IssuePriority priority,
-            IssueType type,
-            String title,
-            String description,
-            Integer storypoints
-    ) {
-        Issue issue = issueRepository.findById(issueId)
+    public Issue updateIssue(Long issueId, Issue issue) {
+        Issue toUpdate = issueRepository.findById(issueId)
                 .orElseThrow(() -> new IllegalStateException(
                         String.format("Student with id %d does not exist", issueId)
                 ));
 
-        if (status != null) {
-            issue.setStatus(status);
-        }
+        //id does not change
+        //status is only changeable from board right now
+        toUpdate.setTitle(issue.getTitle());
+        toUpdate.setDescription(issue.getDescription());
+        toUpdate.setType(issue.getType());
+        toUpdate.setPriority(issue.getPriority());
+        toUpdate.setStorypoints(issue.getStorypoints());
 
-        if (priority != null) {
-            issue.setPriority(priority);
-        }
-
-        if (type != null) {
-            issue.setType(type);
-        }
-
-        if (title != null && title.length() > 0) {
-            issue.setTitle(title);
-        }
-
-        if (description != null && description.length() > 0){
-            issue.setDescription(description);
-        }
-
-        if (storypoints != null && storypoints > 0){
-            issue.setStorypoints(storypoints);
-        }
-
-        issueRepository.save(issue);
-        return issue;
+        issueRepository.save(toUpdate);
+        return toUpdate;
     }
 
     public void deleteIssue(Long issueId) {

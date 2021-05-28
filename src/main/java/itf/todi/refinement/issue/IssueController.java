@@ -25,20 +25,15 @@ public class IssueController {
         return new ResponseEntity<>(issueService.addIssue(issue), HttpStatus.OK);
     }
 
+    @PutMapping
+    public ResponseEntity<Void> updateIssueSorting() {
+        //todo: implement
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PutMapping(path = "{issueId}")
-    public ResponseEntity<Issue> updateIssueWithId(
-            @PathVariable Long issueId,
-            @RequestParam(required = false) IssueStatus status,
-            @RequestParam(required = false) IssuePriority priority,
-            @RequestParam(required = false) IssueType type,
-            @RequestParam(required = false) String title,
-            @RequestParam(required = false) String description,
-            @RequestParam(required = false) Integer storypoints
-    ) {
-        return new ResponseEntity<>(
-                issueService.updateIssue(issueId, status, priority, type, title, description, storypoints),
-                HttpStatus.OK
-        );
+    public ResponseEntity<Issue> updateIssueWithId(@PathVariable Long issueId, @RequestBody Issue issue) {
+        return new ResponseEntity<>(issueService.updateIssue(issueId, issue), HttpStatus.OK);
     }
 
     @DeleteMapping(path = "{issueId}")
