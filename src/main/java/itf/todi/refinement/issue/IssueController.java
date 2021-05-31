@@ -32,14 +32,15 @@ public class IssueController {
     }
 
     @PutMapping
-    public ResponseEntity<List<List<Issue>>> updateIssueSorting(
+    public ResponseEntity<List<List<Issue>>> updateBoard(
+            @RequestParam(value = "issueId") Long issueId,
             @RequestParam(value = "sourceCol") int sourceCol,
             @RequestParam(value = "sourceIdx") int sourceIdx,
             @RequestParam(value = "destCol") int destCol,
             @RequestParam(value = "destIdx") int destIdx)
     {
         return new ResponseEntity<>(
-                issueService.updateIssueSorting(sourceCol, sourceIdx, destCol, destIdx),
+                issueService.updateBoard(issueId, sourceCol, sourceIdx, destCol, destIdx),
                 HttpStatus.OK
         );
     }

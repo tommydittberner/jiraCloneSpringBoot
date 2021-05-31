@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,28 +26,63 @@ public class IssueService {
         return issueRepository.save(issue);
     }
 
-    public List<List<Issue>> updateIssueSorting(int sourceColIdx, int sourceIdx, int destColIdx, int destIdx) {
+    /**
+     * Updates the board after a drag and drop action (same column & moving between columns)
+     * 1. extract and update moved issue
+     * 2. reorder affected columns
+     * 3. put moved issue into destination column
+     * 4. save updated issues
+     * */
+    public List<List<Issue>> updateBoard(Long issueId, int sourceColIdx, int sourceIdx, int destColIdx, int destIdx) {
         Optional<IssueStatus> sourceStatus = getStatusByColumnIndex(sourceColIdx);
-        Optional<IssueStatus> destStatus = getStatusByColumnIndex(destColIdx);
 
         List<Issue> sourceCol = issueRepository
                 .findAllByStatus(sourceStatus.orElseThrow(() ->
-                        new IllegalStateException("source items not found")));
+                        new IllegalStateException(String.format("No issues for status %s found", sourceStatus))));
 
-        List<Issue> destCol = issueRepository
-                .findAllByStatus(destStatus.orElseThrow(() ->
-                        new IllegalStateException("destination items not found")));
+        if(sourceColIdx == destColIdx){
+            Issue toMove = issueRepository
+                    .findById(issueId).orElseThrow(() ->
+                            new IllegalStateException(String.format("no issue with id %s found", issueId)));
 
-        //todo: find issue by something else than the index in the array (too error prone)
-        Issue toMove = sourceCol.remove(sourceIdx);
-        toMove.setStatus(destStatus.get()); //assign new status
-        toMove.setSortingIdx(destIdx);
+            sourceCol.remove(toMove);
 
-        moveAffectedIssues(sourceCol, sourceIdx, destCol, destIdx);
-        destCol.add(destIdx, toMove);
-        updateAffectedIssues(sourceCol, destCol);
+            toMove.setSortingIdx(destIdx);
 
-        return List.of(sourceCol, destCol);
+            reorderSameColumn(sourceCol, sourceIdx, destIdx);
+
+            sourceCol.add(destIdx, toMove);
+
+            issueRepository.saveAll(sourceCol);
+
+            return List.of(sourceCol, List.of());
+        } else {
+            Optional<IssueStatus> destStatus = getStatusByColumnIndex(destColIdx);
+
+            List<Issue> destCol = issueRepository
+                    .findAllByStatus(destStatus.orElseThrow(() ->
+                            new IllegalStateException(String.format("No issues for status %s found", destStatus))));
+
+            Issue toMove = issueRepository
+                    .findById(issueId).orElseThrow(() ->
+                            new IllegalStateException(String.format("no issue with id %s found", issueId)));
+
+            sourceCol.remove(toMove);
+
+            toMove.setStatus(destStatus.get()); //assign new status
+            toMove.setSortingIdx(destIdx);
+
+            reorderColumnChange(sourceCol, sourceIdx, destCol, destIdx);
+
+            destCol.add(destIdx, toMove);
+
+            issueRepository.saveAll(Stream
+                    .of(sourceCol, destCol)
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList()));
+
+            return List.of(sourceCol, destCol);
+        }
     }
 
     @Transactional
@@ -85,28 +117,39 @@ public class IssueService {
                 .findFirst();
     }
 
-    private void moveAffectedIssues(List<Issue> sourceCol, int sourceIdx, List<Issue> destCol, int destIdx) {
-        //move up
-        sourceCol.forEach(issue -> {
+    private void reorderSameColumn(List<Issue> column, int sourceIdx, int destIdx) {
+        column.forEach(issue -> {
             int sortingIdx = issue.getSortingIdx();
-            if (sortingIdx > sourceIdx){
-                issue.setSortingIdx(sortingIdx - 1);
+            if (sortingIdx >= Math.min(sourceIdx, destIdx) &&
+                    sortingIdx <= Math.max(sourceIdx, destIdx)) {
+                if (sourceIdx < destIdx) {
+                    issue.setSortingIdx(sortingIdx - 1); //move up
+                } else {
+                    issue.setSortingIdx(sortingIdx + 1); //push down
+                }
             }
         });
+    }
+    private void reorderColumnChange(List<Issue> sourceCol, int sourceIdx, List<Issue> destCol, int destIdx) {
+        reorderSourceColumn(sourceCol, sourceIdx);
+        reorderDestinationColumn(destCol, destIdx);
+    }
 
-        //push down
-        destCol.forEach(issue -> {
+    private void reorderSourceColumn(List<Issue> column, int idx) {
+        column.forEach(issue -> {
             int sortingIdx = issue.getSortingIdx();
-            if (sortingIdx >= destIdx) { //insert before item with (currently) the same idx
-                issue.setSortingIdx(sortingIdx + 1);
+            if (sortingIdx > idx){
+                issue.setSortingIdx(sortingIdx - 1); //move up
             }
         });
     }
 
-    private void updateAffectedIssues(List<Issue> sourceCol, List<Issue> destCol) {
-        issueRepository.saveAll(Stream
-                .of(sourceCol, destCol)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList()));
+    private void reorderDestinationColumn(List<Issue> column, int idx) {
+        column.forEach(issue -> {
+            int sortingIdx = issue.getSortingIdx();
+            if (sortingIdx >= idx) { //insert before item with (currently) the same idx
+                issue.setSortingIdx(sortingIdx + 1); //push down
+            }
+        });
     }
 }
