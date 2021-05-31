@@ -17,28 +17,46 @@ public class IssueController {
 
     @GetMapping
     public ResponseEntity<List<Issue>> getIssue() {
-        return new ResponseEntity<>(issueService.getIssues(), HttpStatus.OK);
+        return new ResponseEntity<>(
+                issueService.getIssues(),
+                HttpStatus.OK
+        );
     }
 
     @PostMapping
     public ResponseEntity<Issue> addIssue(@RequestBody Issue issue) {
-        return new ResponseEntity<>(issueService.addIssue(issue), HttpStatus.OK);
+        return new ResponseEntity<>(
+                issueService.addIssue(issue),
+                HttpStatus.OK
+        );
     }
 
     @PutMapping
-    public ResponseEntity<Void> updateIssueSorting() {
-        //todo: implement
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<List<List<Issue>>> updateIssueSorting(
+            @RequestParam(value = "sourceCol") int sourceCol,
+            @RequestParam(value = "sourceIdx") int sourceIdx,
+            @RequestParam(value = "destCol") int destCol,
+            @RequestParam(value = "destIdx") int destIdx)
+    {
+        return new ResponseEntity<>(
+                issueService.updateIssueSorting(sourceCol, sourceIdx, destCol, destIdx),
+                HttpStatus.OK
+        );
     }
 
     @PutMapping(path = "{issueId}")
     public ResponseEntity<Issue> updateIssueWithId(@PathVariable Long issueId, @RequestBody Issue issue) {
-        return new ResponseEntity<>(issueService.updateIssue(issueId, issue), HttpStatus.OK);
+        return new ResponseEntity<>(
+                issueService.updateIssue(issueId, issue),
+                HttpStatus.OK
+        );
     }
 
     @DeleteMapping(path = "{issueId}")
     public ResponseEntity<Void> deleteIssueWithId(@PathVariable Long issueId) {
         issueService.deleteIssue(issueId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(
+                HttpStatus.NO_CONTENT
+        );
     }
 }

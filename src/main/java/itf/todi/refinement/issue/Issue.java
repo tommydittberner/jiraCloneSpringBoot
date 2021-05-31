@@ -40,8 +40,11 @@ public class Issue {
     private Integer storypoints;
 
     @Column(nullable = false, length = 24)
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private IssueStatus status;
+
+    @Column(nullable = true) //todo: should be false
+    private int sortingIdx;
 
     @Column(nullable = false, length = 24)
     @Enumerated(EnumType.STRING)
@@ -56,6 +59,7 @@ public class Issue {
             String description,
             Integer storypoints,
             IssueStatus status,
+            int sortingIdx,
             IssuePriority priority,
             IssueType type
     ) {
@@ -63,6 +67,7 @@ public class Issue {
         this.description = description;
         this.storypoints = storypoints;
         this.status = status;
+        this.sortingIdx = sortingIdx;
         this.priority = priority;
         this.type = type;
     }
