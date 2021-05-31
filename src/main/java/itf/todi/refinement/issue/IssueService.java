@@ -23,6 +23,7 @@ public class IssueService {
     }
 
     public Issue addIssue(Issue issue) {
+        issue.setSortingIdx(issueRepository.findAllByStatus(issue.getStatus()).size());
         return issueRepository.save(issue);
     }
 
