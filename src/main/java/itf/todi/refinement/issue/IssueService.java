@@ -90,7 +90,7 @@ public class IssueService {
     public Issue updateIssue(Long issueId, Issue issue) {
         Issue toUpdate = issueRepository.findById(issueId)
                 .orElseThrow(() -> new IllegalStateException(
-                        String.format("Student with id %d does not exist", issueId)
+                        String.format("Issue with id %d does not exist", issueId)
                 ));
 
         //id does not change

@@ -2,6 +2,7 @@ package itf.todi.refinement.issue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -38,14 +39,14 @@ class IssueControllerIntegrationTest {
 
     //todo: beforeAll and afterAll seems smarter
     @AfterEach
-    void clearRepository() {
+    void teardown() {
         repository.deleteAll();
     }
 
     @Test
-    void getIssue() throws Exception {
-        Issue i1 = createTestIssue("My first issue");
-        Issue i2 = createTestIssue("A second issue");
+    void itShouldGetAllIssues() throws Exception {
+        Issue i1 = createIssueForTesting("My first issue");
+        Issue i2 = createIssueForTesting("A second issue");
         repository.saveAll(List.of(i1, i2));
 
         //this is the more verbose approach without all the static imports
@@ -59,8 +60,8 @@ class IssueControllerIntegrationTest {
     }
 
     @Test
-    void addIssue() throws Exception {
-        Issue issue = createTestIssue("My first issue");
+    void itShouldAddANewIssue() throws Exception {
+        Issue issue = createIssueForTesting("My first issue");
 
         mvc.perform(post("/api/issue")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -74,15 +75,17 @@ class IssueControllerIntegrationTest {
                 .contains(issue);
     }
 
-//    @Test
-//    void updateIssueWithId() {
-//    }
-//
-//    @Test
-//    void deleteIssueWithId() {
-//    }
+    @Test
+    @Disabled
+    void updateIssueWithId() {
+    }
 
-    private Issue createTestIssue(String title) {
+    @Test
+    @Disabled
+    void deleteIssueWithId() {
+    }
+
+    private Issue createIssueForTesting(String title) {
         return new Issue(
                 title,
                 "default desc",
