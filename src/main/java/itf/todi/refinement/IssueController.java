@@ -1,9 +1,13 @@
-package itf.todi.refinement.issue;
+package itf.todi.refinement;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import itf.todi.refinement.model.Issue;
+import itf.todi.refinement.model.UpdateInfo;
+import itf.todi.refinement.services.IssueServiceImpl;
 
 import java.util.List;
 
@@ -13,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class IssueController {
 
-    private final IssueService issueService;
+    private final IssueServiceImpl issueService;
 
     @GetMapping
     public ResponseEntity<List<Issue>> getIssue() {
@@ -32,15 +36,16 @@ public class IssueController {
     }
 
     @PutMapping
-    public ResponseEntity<List<List<Issue>>> updateBoard(
-            @RequestParam(value = "issueId") Long issueId,
-            @RequestParam(value = "sourceCol") int sourceCol,
-            @RequestParam(value = "sourceIdx") int sourceIdx,
-            @RequestParam(value = "destCol") int destCol,
-            @RequestParam(value = "destIdx") int destIdx)
+    public ResponseEntity<List<List<Issue>>> updateBoard(@RequestBody UpdateInfo updateInfo)
     {
         return new ResponseEntity<>(
-                issueService.updateBoard(issueId, sourceCol, sourceIdx, destCol, destIdx),
+                issueService.updateBoard(
+                    updateInfo.getIssueId(), 
+                    updateInfo.getSourceCol(), 
+                    updateInfo.getSourceIdx(), 
+                    updateInfo.getDestCol(),
+                    updateInfo.getDestIdx()
+                ),
                 HttpStatus.OK
         );
     }

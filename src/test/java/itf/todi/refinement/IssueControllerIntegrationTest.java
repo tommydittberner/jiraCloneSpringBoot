@@ -1,6 +1,10 @@
-package itf.todi.refinement.issue;
+package itf.todi.refinement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import itf.todi.refinement.model.Issue;
+import itf.todi.refinement.repositories.IssueRepository;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -16,6 +20,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
 
+import static itf.todi.refinement.TestUtil.createMockIssue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -45,8 +50,8 @@ class IssueControllerIntegrationTest {
 
     @Test
     void itShouldGetAllIssues() throws Exception {
-        Issue i1 = createIssueForTesting("My first issue");
-        Issue i2 = createIssueForTesting("A second issue");
+        Issue i1 = createMockIssue("My first issue");
+        Issue i2 = createMockIssue("A second issue");
         repository.saveAll(List.of(i1, i2));
 
         //this is the more verbose approach without all the static imports
@@ -61,7 +66,7 @@ class IssueControllerIntegrationTest {
 
     @Test
     void itShouldAddANewIssue() throws Exception {
-        Issue issue = createIssueForTesting("My first issue");
+        Issue issue = createMockIssue("My first issue");
 
         mvc.perform(post("/api/issue")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -83,17 +88,5 @@ class IssueControllerIntegrationTest {
     @Test
     @Disabled
     void deleteIssueWithId() {
-    }
-
-    private Issue createIssueForTesting(String title) {
-        return new Issue(
-                title,
-                "default desc",
-                3,
-                IssueStatus.OPEN,
-                0,
-                IssuePriority.NORMAL,
-                IssueType.TASK
-        );
     }
 }

@@ -1,8 +1,14 @@
-package itf.todi.refinement.issue;
+package itf.todi.refinement;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import itf.todi.refinement.model.Issue;
+import itf.todi.refinement.model.IssuePriority;
+import itf.todi.refinement.model.IssueStatus;
+import itf.todi.refinement.model.IssueType;
+import itf.todi.refinement.repositories.IssueRepository;
 
 import java.util.List;
 
@@ -120,7 +126,7 @@ public class IssueConfig {
 //                    IssuePriority.HIGH,
 //                    IssueType.TASK
 //            );
-//
+
 //            repository.saveAll(List.of(i1, i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12));
 //        };
 //    }

@@ -1,4 +1,4 @@
-package itf.todi.refinement.issue;
+package itf.todi.refinement.model;
 
 import lombok.*;
 import javax.persistence.*;
@@ -7,11 +7,8 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "issue")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
-@EqualsAndHashCode
-@ToString
 public class Issue {
 
     @Id
@@ -37,7 +34,7 @@ public class Issue {
     private String description;
 
     @Column(nullable = false)
-    private Integer storypoints;
+    private int storypoints;
 
     @Column(nullable = false, length = 24)
     @Enumerated(EnumType.ORDINAL)
@@ -57,7 +54,7 @@ public class Issue {
     public Issue(
             String title,
             String description,
-            Integer storypoints,
+            int storypoints,
             IssueStatus status,
             int sortingIdx,
             IssuePriority priority,

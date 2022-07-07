@@ -1,4 +1,4 @@
-package itf.todi.refinement.issue;
+package itf.todi.refinement;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,6 +7,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import itf.todi.refinement.model.Issue;
+import itf.todi.refinement.model.IssuePriority;
+import itf.todi.refinement.repositories.IssueRepository;
+import itf.todi.refinement.services.IssueServiceImpl;
+
+import static itf.todi.refinement.TestUtil.createMockIssue;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,11 +23,11 @@ public class IssueServiceTest {
     @Mock
     private IssueRepository issueRepository;
 
-    private IssueService issueService;
+    private IssueServiceImpl issueService;
 
     @BeforeEach
     void setUp() {
-        issueService = new IssueService(issueRepository);
+        issueService = new IssueServiceImpl(issueRepository);
     }
 
     @Test
@@ -34,7 +40,7 @@ public class IssueServiceTest {
     @Test
     void canAddIssues() {
         //prepare
-        Issue newIssue = createIssueForTesting("TestIssue");
+        Issue newIssue = createMockIssue("TestIssue");
         issueService.addIssue(newIssue);
         ArgumentCaptor<Issue> issueArgumentCaptor = ArgumentCaptor.forClass(Issue.class);
         //verify save was called & capture saved object
@@ -45,11 +51,11 @@ public class IssueServiceTest {
 
     @Test
     void canUpdateIssue() {
-        Issue toUpdate = createIssueForTesting("WillBeUpdated");
+        Issue toUpdate = createMockIssue("WillBeUpdated");
         toUpdate.setId(1L);
         when(issueRepository.findById(1L)).thenReturn(java.util.Optional.of(toUpdate));
 
-        Issue updated = createIssueForTesting("This has been updated");
+        Issue updated = createMockIssue("This has been updated");
         updated.setId(1L);
         updated.setPriority(IssuePriority.HIGH);
         updated.setStorypoints(13);
@@ -58,17 +64,5 @@ public class IssueServiceTest {
         ArgumentCaptor<Issue> issueArgumentCaptor = ArgumentCaptor.forClass(Issue.class);
         verify(issueRepository).save(issueArgumentCaptor.capture());
         assertThat(issueArgumentCaptor.getValue()).isEqualTo(updated);
-    }
-
-    private Issue createIssueForTesting(String title) {
-        return new Issue(
-                title,
-                "default desc",
-                3,
-                IssueStatus.OPEN,
-                0,
-                IssuePriority.NORMAL,
-                IssueType.TASK
-        );
     }
 }
